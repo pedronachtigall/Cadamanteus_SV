@@ -26,7 +26,6 @@ Then, we lifted annotations from primary to both haplotypes using [LiftOff](http
 
 ```
 liftoff -g Cadam_primary_chromosomes.funannotate.gff Cadam_hap1_chromosomes.fasta Cadam_primary_chromosomes.fasta -o Cadam_hap1_chromosomes.funannotate.liftoff.gff
-
 liftoff -g Cadam_primary_chromosomes.funannotate.gff Cadam_hap2_chromosomes.fasta Cadam_primary_chromosomes.fasta -o Cadam_hap2_chromosomes.funannotate.liftoff.gff
 ```
 
@@ -58,10 +57,18 @@ The toxin genes were manually reviewed and curated following the "[Checking anno
 The toxin annotation was lifted from primary to both haplotypes using LiftOff.
 ```
 liftoff -g Cadam_primary_chromosomes.toxin.gtf Cadam_hap1_chromosomes.fasta Cadam_primary_chromosomes.fasta -o Cadam_hap1_chromosomes.toxin.liftoff.gtf
-
 liftoff -g Cadam_primary_chromosomes.toxin.gtf Cadam_hap2_chromosomes.fasta Cadam_primary_chromosomes.fasta -o Cadam_hap2_chromosomes.toxin.liftoff.gtf
 ```
 
+## Estimate expression level
+We used Bowtie2 and RSEM to estimate the expression level of venom-gland from several individuals as described in the "[Estimating expression level](https://github.com/pedronachtigall/ToxCodAn-Genome/tree/main/Guide#estimating-expression-level)" section of the ToxCodAn-Genome's guide. We mapped the reads into the CDSs retrieved from annotation files and set the ```mismatch-rate``` parameter to 0.02.
+
+```
+rsem-prepare-reference --bowtie2 Cadam_primary_annotation_cds.fasta CADAM
+for i in DRR0105 DRR0044 DRR0106 DRR0107 DRR0108 KW0944 KW1264 KW1942 KW2161 KW2170 KW2171 KW2184 MM0114 MM0127 MM0143 MM0198 TJC1661 TJC1665; do
+	rsem-calculate-expression -p 20 --paired-end --bowtie2 --bowtie2-mismatch-rate 0.02 ../rna/${i}_tg/${i}_R1_val_1.fq.gz ../rna/${i}_tg/${i}_R2_val_2.fq.gz CADAM ${i}_rsem
+done
+```
 
 ## Cite
 
