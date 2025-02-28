@@ -63,26 +63,94 @@ yahs Cadam_DRR0105.hic.p_ctg.fasta aligned.bam
 ```
 
 ### Review of scaffolded genome
-We used [Juicer](https://github.com/aidenlab/juicer) to manually review the scaffolded genome following the standard [DNA Genome Assembly Cookbook](https://aidenlab.org/assembly/manual 180322.pdf) instructions.
+We used [Juicer](https://github.com/aidenlab/juicer) and the [3D-DNA](https://github.com/aidenlab/3d-dna) to manually review the scaffolded genome following the standard [DNA Genome Assembly Cookbook](https://aidenlab.org/assembly/manual 180322.pdf) instructions.
 
 ```
+#prepare folder to run juicer
+mkdir Juicer && cd Juicer
+mkdir fastq references restriction_sites splits
 
+#softlink and index the genome sequence in the references/ folder
+cd references
+ln -s ../../yahs.out_scaffolds_final.fa .
+bwa index yahs.out_scaffolds_final.fa
+
+#create a sizes.genome file containing all the chromosome/scaffold sizes
+samtools faidx yahs.out_scaffolds_final.fa
+cut -f1,2 yahs.out_scaffolds_final.fa.fai > ../sizes.genome
+
+#create restriction enzyme proposed cutting sites
+cd ../restriction_sites
+python /path/to/juicer-1.6/misc/generate_site_positions.py Arima yahs.out_scaffolds_final.fa ../references/yahs.out_scaffolds_final.fa
+
+#get your HiC reads ready
+cd ../fastq
+ln -s ../../../SRR28357486_hic_tg/SRR28357486_R1_val_1.fq hic_R1.fastq
+ln -s ../../../SRR28357486_hic_tg/SRR28357486_R2_val_2.fq hic_R2.fastq
+
+#splits reads
+cd ../splits/
+split -a 3 -l 90000000 -d --additional-suffix=_R2.fastq ../fastq/hic_R2.fastq &
+split -a 3 -l 90000000 -d --additional-suffix=_R1.fastq ../fastq/hic_R1.fastq &
+cd ..
+
+mkdir -p scripts/common
+cp /path/to/juicer-1.6/CPU/common/* scripts/common
+cp /path/to/juicer_tools.2.20.00.jar scripts/common/juicer_tools.jar
+
+#run juicer
+cd ../..
+/path/to/juicer-1.6/CPU/juicer.sh -d Juicer -p Juicer/sizes.genome -y Juicer/restriction_sites/Cadam_chr.primary.fasta_Arima.txt -z Juicer/references/yahs.out_scaffolds_final.fa -g yahs.out_scaffolds_final.fa -t 32 -D Juicer
+
+#visualize candidate assembly
+cd Juicer/aligned/
+awk -f /path/to/3d-dna/utils/generate-assembly-file-from-fasta.awk ../references/yahs.out_scaffolds_final.fa > yahs.out_scaffolds_final.fa.assembly
+/path/to/3d-dna/visualize/run-assembly-visualizer.sh yahs.out_scaffolds_final.fa.assembly merged_nodups.txt
 ```
-To help in the review process, we also checked for telomeric sequences within scaffolds using [tidk](https://github.com/tolkit/telomeric-identifier)
+The .hic and .assembly files must be reviewed using [JuiceBox](https://github.com/aidenlab/Juicebox).
+
+To help in the review process, we checked for telomeric sequences within scaffolds using [tidk](https://github.com/tolkit/telomeric-identifier) and the conserved telomeric motif of vertebrates (TTAGGG). We also mapped the assembled mitochondrial genome to check for mitochondrial contigs/scaffolds that can be removed.
 ```
+tidk search -s TTAGGG --dir tidk_out --output Cadam_pri_prereview yahs.out_scaffolds_final.fa
+tidk search -s TTAGGG --dir tidk_out --output Cadam_pri_prereview --extension bedgraph yahs.out_scaffolds_final.fa
+tidk plot --csv tidk_out/Cadam_pri_prereview_telomeric_repeat_windows.csv --output tidk_out/Cadam_pri_prereview_telomeric_repeat_windows
+
+mkdir mitocheck && cd mitocheck
+makeblastdb -in yahs.out_scaffolds_final.fa -out blastDB/genome -dbtype nucl
+blastn -query ../../mitogenome/Cadam_mitogenome.fasta -db blastDB/genome -out blast.out -evalue 1E-6 -qcov_hsp_perc 40 -num_threads 20 -outfmt 6
 ```
 
 After reviewing, we generate the final scaffolded primary assembly.
 ```
+#the working directory must be Juicer/aligned/
+/path/to/run-asm-pipeline-post-review.sh –r draft.final.review.assembly ../references/yahs.out_scaffolds_final.fa merged_nodups.txt
 ```
+
+### Assign chromosomes
+To identify chromosomes, we used a set of chromosome-specific markers (NCBI accessions SAMN00177542 and SAMN00152474) of snakes<sup>[Matsubara
+et al., 2006](https://doi.org/10.1073/pnas.0605274103)</sup> and the chromosome-level genome available of the closely related species *C. viridis*<sup>[Schield et al., 2019](http://www.genome.org/cgi/doi/10.1101/gr.240952.118)</sup>. We used [BLAST](https://blast.ncbi.nlm.nih.gov/doc/blast-help/downloadblastdata.html) and [minimap2](https://github.com/lh3/minimap2) to perform this analysis and manually checked the outputs.
+
+```
+makeblastdb -in yahs.out_scaffolds_final.FINAL.fasta -out blastDB/ALL -dbtype nucl
+blastn -query /path/to/markers_sequence.fasta -out blast_markers.out -db blastDB/ALL -num_threads 20 -max_target_seqs 1 -outfmt 6
+minimap2 -ax splice yahs.out_scaffolds_final.FINAL.fasta /path/to/markers_sequence.fasta > mm2_markers.sam
+minimap2 -k19 -w19 -t32 /path/to/Crovir_chr_only.fasta yahs.out_scaffolds_final.FINAL.fasta > mm2_cvir.paf
+```
+
+After characterizing chromosomes, we renamed the scaffolds and split the file into chromsomes and unplaced for downstream analysis.
 
 ### Haplotype-resolved
 The haplotype-resolved assemblies were generated using [RagTag](https://github.com/malonge/RagTag) with each haplotype contigs as a query and the primary chromosome-level assembly as a reference.
 
+```
+mkdir haplotype_resolved && cd haplotype_resolved
+ragtag.py scaffold -t 10 Cadam_primary_chromosomes.fasta ../Cadam.hic.hap1.p_ctg.fasta -o ragtag_hifiasm_hap1
+ragtag.py scaffold -t 10 Cadam_primary_chromosomes.fasta ../Cadam.hic.hap2.p_ctg.fasta -o ragtag_hifiasm_hap2
+```
 
 ### Checking genome quality
 #### BUSCO
-
+We used [BUSCO](https://busco.ezlab.org/) with the Tetrapoda database to assess the completeness.
 ```
 busco -i Cadam_primary_chromosomes.fasta -m genome -l tetrapoda_odb10 -c 20 -o busco_primary
 busco -i Cadam_hap1_chromosomes.fasta -m genome -l tetrapoda_odb10 -c 20 -o busco_hap1
@@ -90,5 +158,18 @@ busco -i Cadam_hap2_chromosomes.fasta -m genome -l tetrapoda_odb10 -c 20 -o busc
 ```
 
 #### Inspector
+We used [Inspector](https://github.com/Maggi-Chen/Inspector) to assess genomic statistics and assembly quality by calculating the QV score.
+```
+inspector.py -c Cadam_primary_chromosomes.fasta -r Cadam.hifi.fastq -o inspector_pri_out/ --datatype hifi --thread 10
+inspector.py -c Cadam_hap1_chromosomes.fasta -r Cadam.hifi.fastq -o inspector_hap1_out/ --datatype hifi --thread 10
+inspector.py -c Cadam_hap2_chromosomes.fasta -r Cadam.hifi.fastq -o inspector_hap2_out/ --datatype hifi --thread 10
+```
 
 #### VerityMap
+We used [VerityMap](https://github.com/ablab/VerityMap) to detect error-prone regions in the assemblies.
+```
+python /path/to/VerityMap/veritymap/main.py -t 20 -d hifi-diploid --reads Cadam.hifi.fastq -o Cadam_pri_VM Cadam_primary_chromosomes.fasta
+python /path/to/VerityMap/veritymap/main.py -t 20 -d hifi-diploid --reads Cadam.hifi.fastq -o Cadam_hap1_VM Cadam_hap1_chromosomes.fasta
+python /path/to/VerityMap/veritymap/main.py -t 20 -d hifi-diploid --reads Cadam.hifi.fastq -o Cadam_hap2_VM Cadam_hap2_chromosomes.fasta
+
+```
