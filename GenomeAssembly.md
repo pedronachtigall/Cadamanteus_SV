@@ -29,5 +29,20 @@ We used [MITGARD](https://github.com/pedronachtigall/MITGARD) to perform the mit
 ### Draft genome assembly
 We used [hifiasm](https://github.com/chhylp123/hifiasm) to perform the draft genome assembly using HiFi and HiC reads to acquire both resolved haplotypes.
 
-### Scaffold genome
+### Scaffold draft genome
 We used [YaHS](https://github.com/c-zhou/yahs) to scaffold the primary genome assembled by hifiasm.
+
+### Review of scaffolded genome
+
+### Checking genome quality
+#### BUSCO
+
+```
+busco -i Cadam_primary_chromosomes.fasta -m genome -l tetrapoda_odb10 -c 20 -o busco_primary
+busco -i Cadam_hap1_chromosomes.fasta -m genome -l tetrapoda_odb10 -c 20 -o busco_hap1
+busco -i Cadam_hap2_chromosomes.fasta -m genome -l tetrapoda_odb10 -c 20 -o busco_hap2
+```
+
+#### Inspector
+
+#### VerityMap
