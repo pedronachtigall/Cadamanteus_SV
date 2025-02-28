@@ -7,7 +7,10 @@
 This repository contains commands and scripts used in the manuscript "A Segregating Structural Variant Defines Novel Venom
 Phenotypes in the Eastern Diamondback Rattlesnake" published in *Molecular Biology and Evolution*.
 
+All datasets used in the present study are detailed in the Supplementary file of the published manuscript.
+
 ## Genome Assembly
+The genome assembly is described in the "[GenomeAssembly.md](https://github.com/pedronachtigall/Cadamanteus_SV/blob/main/GenomeAssembly.md)" file.
 
 ## Genome annotation
 ### Repeat annotation
@@ -63,15 +66,31 @@ liftoff -g Cadam_primary_chromosomes.toxin.gtf Cadam_hap2_chromosomes.fasta Cada
 ## Estimate expression level
 We used Bowtie2 and RSEM to estimate the expression level of venom-gland from several individuals as described in the "[Estimating expression level](https://github.com/pedronachtigall/ToxCodAn-Genome/tree/main/Guide#estimating-expression-level)" section of the ToxCodAn-Genome's guide. We mapped the reads into the CDSs retrieved from annotation files and set the ```mismatch-rate``` parameter to 0.02.
 
+We used the merged annotation and the primary assembly to retrieve the toxin and nontoxin set of CDSs. The CDSs were retrieved using [GffRead](https://github.com/gpertea/gffread). The datasets used to estimate the expression level of venom-gland is in the file "vg_rna.list". We also trimmed adapters and removed low-quality reads using trim_galore.
+
 ```
+#retrieve CDSs
+gffread -x Cadam_primary_annotation_cds.fasta -g Cadam_primary_chromosomes.fasta Cadam_primary_chromosomes.MERGE.gtf
+
+#estimate expression level
 rsem-prepare-reference --bowtie2 Cadam_primary_annotation_cds.fasta CADAM
-for i in DRR0105 DRR0044 DRR0106 DRR0107 DRR0108 KW0944 KW1264 KW1942 KW2161 KW2170 KW2171 KW2184 MM0114 MM0127 MM0143 MM0198 TJC1661 TJC1665; do
-	rsem-calculate-expression -p 20 --paired-end --bowtie2 --bowtie2-mismatch-rate 0.02 ../rna/${i}_tg/${i}_R1_val_1.fq.gz ../rna/${i}_tg/${i}_R2_val_2.fq.gz CADAM ${i}_rsem
+for i in ; do
+	rsem-calculate-expression -p 20 --paired-end --bowtie2 --bowtie2-mismatch-rate 0.02 rna/${i}_tg/${i}_R1_val_1.fq.gz rna/${i}_tg/${i}_R2_val_2.fq.gz CADAM ${i}_rsem
 done
 ```
 
-## Cite
+## Gene tree
+When needed (e.g., to analyze SVMPs and SVSPs), we inferred the gene tree using their CDSs. We used [MAFFT](https://github.com/GSLBiotech/mafft) and [IQ-TREE](https://github.com/Cibiv/IQ-TREE) for alignment of sequences and infer gene tree, respectively. The input files, which consist of a fasta file with sequences from the target gene family, were set manually.
 
+```
+mafft --auto GENE.fasta > GENE.ALIGNED.fasta
+iqtree -s GENE.ALIGNED.fasta -m TEST -bb 1000 -alrt 1000
+```
+
+The trees were inspected and adjusted using [FigTree](https://github.com/rambaut/figtree/).
+
+## Cite
+If you follow the pipelines and/or scripts in this repository, please cite:
 ```
 ADD bibtext here
 ```
