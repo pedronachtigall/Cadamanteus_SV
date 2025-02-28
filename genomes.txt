@@ -1,0 +1,2 @@
+Cadam_hap1_chromosomes.fasta	hap1	lw:1.5
+Cadam_hap2_chromosomes.fasta	hap2	lw:1.5
