@@ -9,7 +9,7 @@ Phenotypes in the Eastern Diamondback Rattlesnake" published in *Molecular Biolo
 
 All datasets used in the present study are detailed in the Supplementary file of the published manuscript.
 
-## Genome Assembly
+## Genome assembly
 The genome assembly is described in the "[GenomeAssembly.md](https://github.com/pedronachtigall/Cadamanteus_SV/blob/main/GenomeAssembly.md)" file.
 
 ## Genome annotation
@@ -92,8 +92,8 @@ gffread -x Cadam_primary_annotation_cds.fasta -g Cadam_primary_chromosomes.fasta
 
 #estimate expression level
 rsem-prepare-reference --bowtie2 Cadam_primary_annotation_cds.fasta CADAM
-for i in ; do
-	rsem-calculate-expression -p 20 --paired-end --bowtie2 --bowtie2-mismatch-rate 0.02 rna/${i}_tg/${i}_R1_val_1.fq.gz rna/${i}_tg/${i}_R2_val_2.fq.gz CADAM ${i}_rsem
+for i in vg_rna.list; do
+	rsem-calculate-expression -p 20 --paired-end --bowtie2 --bowtie2-mismatch-rate 0.02 ${i}_tg/${i}_R1_val_1.fq.gz ${i}_tg/${i}_R2_val_2.fq.gz CADAM ${i}_rsem
 done
 ```
 
@@ -115,11 +115,6 @@ We used [syri](https://github.com/schneebergerlab/syri) and followed its guide t
 minimap2 -ax asm5 --eqx Cadam_hap1_chromosomes.fasta Cadam_hap2_chromosomes.fasta > out.sam
 syri -c out.sam -r Cadam_hap1_chromosomes.fasta -q Cadam_hap2_chromosomes.fasta -k -F S
 plotsr --sr syri.out --genomes genomes.txt -H 8 -W 5 -o ALL_hap1Xhap2.pdf
-```
--"genomes.txt" file content:
-```
-Cadam_hap1_chromosomes.fasta	hap1	lw:1.5
-Cadam_hap2_chromosomes.fasta	hap2	lw:1.5
 ```
 
 ### Gene-level
