@@ -173,3 +173,9 @@ python /path/to/VerityMap/veritymap/main.py -t 20 -d hifi-diploid --reads Cadam.
 python /path/to/VerityMap/veritymap/main.py -t 20 -d hifi-diploid --reads Cadam.hifi.fastq -o Cadam_hap2_VM Cadam_hap2_chromosomes.fasta
 
 ```
+
+#### NucFreq
+We used [NucFreq](https://github.com/mrvollger/NucFreq) to check for collapsed regions, which may reflect assembly artifacts occurring in error-prone regions.
+```
+NucPlot.py ${chr}${begin}-${end}.bam ${chr}${begin}-${end}.png -t $thread --bed file.bed
+```
