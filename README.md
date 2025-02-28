@@ -71,7 +71,6 @@ wget https://raw.githubusercontent.com/pedronachtigall/ToxCodAn-Genome/main/Data
 
 toxcodan-genome.py -c 10 -g Cadam_primary_chromosomes.fasta -C Cadam_VG_toxins.toxcodan.fasta -d Viperidae_db.fasta
 
-#the annotation file to be reviewed is: ToxCodAnGenome_output/toxin_annotation.gtf
 ```
 
 The toxin genes were manually reviewed and curated following the "[Checking annotations](https://github.com/pedronachtigall/ToxCodAn-Genome/tree/main/Guide#checking-annotations)" section of the ToxCodAn-Genome's guide to ensure a comprehensive toxin annotation.
@@ -107,6 +106,26 @@ iqtree -s GENE.ALIGNED.fasta -m TEST -bb 1000 -alrt 1000
 ```
 
 The trees were inspected and adjusted using [FigTree](https://github.com/rambaut/figtree/).
+
+## Comparing haplotypes
+
+### Sequence-level
+We used [syri](https://github.com/schneebergerlab/syri) and followed its guide to compare haplotypes at sequence-level.
+```
+minimap2 -ax asm5 --eqx Cadam_hap1_chromosomes.fasta Cadam_hap2_chromosomes.fasta > out.sam
+syri -c out.sam -r Cadam_hap1_chromosomes.fasta -q Cadam_hap2_chromosomes.fasta -k -F S
+plotsr --sr syri.out --genomes genomes.txt -H 8 -W 5 -o ALL_hap1Xhap2.pdf
+```
+-"genomes.txt" file content:
+```
+Cadam_hap1_chromosomes.fasta	hap1	lw:1.5
+Cadam_hap2_chromosomes.fasta	hap2	lw:1.5
+```
+
+### Gene-level
+We used [GENESPACE](https://github.com/jtlovell/GENESPACE) and followed its guide to compare haplotypes at gene-level.
+
+### Microsynteny of toxin genes
 
 ## Cite
 If you follow the pipelines and/or scripts in this repository, please cite:
