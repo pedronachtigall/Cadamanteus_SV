@@ -40,19 +40,38 @@ MitoZ.py annotate --genetic_code auto --clade Chordata --outprefix mitogenome_an
 ### Toxin annotation
 We used [ToxCodAn-Genome](https://github.com/pedronachtigall/ToxCodAn-Genome) to annotate toxins.
 
-For this step, we used the primary assembly, the venom-gland transcriptome data annotated using [ToxCodAn](https://github.com/pedronachtigall/ToxCodAn) and the [Viperidae](https://raw.githubusercontent.com/pedronachtigall/ToxCodAn-Genome/main/Databases/Viperidae_db.fasta) database.
+For this step, we used the primary assembly, the venom-gland transcriptome data annotated using [ToxCodAn](https://github.com/pedronachtigall/ToxCodAn) and the [Viperidae](https://raw.githubusercontent.com/pedronachtigall/ToxCodAn-Genome/main/Databases/Viperidae_db.fasta) database. We used the venom-gland transcriptome data of a male and female individuals (SRR21096543 and SRR21096547).
 
-First, assembly the venomg-land transcriptome and annotate it using ToxCodAn.
+First, we assembled the venom-gland transcriptome. For the transcriptome assembly, we used the "[TRassembly.py](https://raw.githubusercontent.com/pedronachtigall/ToxCodAn-Genome/refs/heads/main/bin/TRassembly.py)" script from ToxCodAn-Genome, which uses the genome-guided mode of Trinity and StringTie and the *de novo* mode of Trinity and rnaSPAdes.
+
+```
+#trim reads
+trim_galore --paired --phred33 --length 75 -q 25 --stringency 1 -e 0.1 -o SRR21096543_tg SRR21096543_R1.fastq.gz SRR21096543_R2.fastq.gz
+trim_galore --paired --phred33 --length 75 -q 25 --stringency 1 -e 0.1 -o SRR21096547_tg SRR21096547_R1.fastq.gz SRR21096547_R2.fastq.gz
+
+#assembly transcripts
+TRassembly.py -g Cadam_primary_chromosomes.fasta -r SRR21096543_R1_val_1.fastq.gz,SRR21096543_R2_val_2.fastq.gz -c 20 -M 20G --output SRR21096543_TRassembly
+TRassembly.py -g Cadam_primary_chromosomes.fasta -r SRR21096547_R1_val_1.fastq.gz,SRR21096547_R2_val_2.fastq.gz -c 20 -M 20G --output SRR21096547_TRassembly
 ```
 
+Annotate the transcriptome using ToxCodAn.
+```
+wget https://github.com/pedronachtigall/ToxCodAn/raw/refs/heads/master/models.zip
+unzip models.zip
+toxcodan.py -c 10 -t SRR21096543_TRassembly/transcripts.fasta -m models -o SRR21096543_ToxCodAn -s SRR21096543
+toxcodan.py -c 10 -t SRR21096547_TRassembly/transcripts.fasta -m models -o SRR21096547_ToxCodAn -s SRR21096547
+
+cat SRR21096543_ToxCodAn/SRR21096543_Toxins_cds_RedundancyFiltered.fasta SRR21096543_ToxCodAn/SRR21096543_PutativeToxins_cds_SPfiltered.fasta \
+SRR21096547_ToxCodAn/SRR21096547_Toxins_cds_RedundancyFiltered.fasta SRR21096547_ToxCodAn/SRR21096547_PutativeToxins_cds_SPfiltered.fasta > Cadam_VG_toxins.toxcodan.fasta
 ```
 
 Then, run ToxCodAn-Genome setting the annotated toxins from the vneomg-land transcriptome and the Viperidae database.
 ```
 wget https://raw.githubusercontent.com/pedronachtigall/ToxCodAn-Genome/main/Databases/Viperidae_db.fasta
 
+toxcodan-genome.py -c 10 -g Cadam_primary_chromosomes.fasta -C Cadam_VG_toxins.toxcodan.fasta -d Viperidae_db.fasta
 
-
+#the annotation file to be reviewed is: ToxCodAnGenome_output/toxin_annotation.gtf
 ```
 
 The toxin genes were manually reviewed and curated following the "[Checking annotations](https://github.com/pedronachtigall/ToxCodAn-Genome/tree/main/Guide#checking-annotations)" section of the ToxCodAn-Genome's guide to ensure a comprehensive toxin annotation.
