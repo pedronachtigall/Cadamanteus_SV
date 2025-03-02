@@ -64,7 +64,6 @@ yahs Cadam_DRR0105.hic.p_ctg.fasta aligned.bam
 
 ### Review of scaffolded genome
 We used [Juicer](https://github.com/aidenlab/juicer) and the [3D-DNA](https://github.com/aidenlab/3d-dna) to manually review the scaffolded genome following the standard [DNA Genome Assembly Cookbook](https://aidenlab.org/assembly/manual 180322.pdf) instructions.
-
 ```
 #prepare folder to run juicer
 mkdir Juicer && cd Juicer
@@ -129,7 +128,6 @@ After reviewing, we generate the final scaffolded primary assembly.
 ### Assign chromosomes
 To identify chromosomes, we used a set of chromosome-specific markers (NCBI accessions SAMN00177542 and SAMN00152474) of snakes<sup>[Matsubara
 et al., 2006](https://doi.org/10.1073/pnas.0605274103)</sup> and the chromosome-level genome available of the closely related species *C. viridis*<sup>[Schield et al., 2019](http://www.genome.org/cgi/doi/10.1101/gr.240952.118)</sup>. We used [BLAST](https://blast.ncbi.nlm.nih.gov/doc/blast-help/downloadblastdata.html) and [minimap2](https://github.com/lh3/minimap2) to perform this analysis and manually checked the outputs.
-
 ```
 makeblastdb -in yahs.out_scaffolds_final.FINAL.fasta -out blastDB/ALL -dbtype nucl
 blastn -query /path/to/markers_sequence.fasta -out blast_markers.out -db blastDB/ALL -num_threads 20 -max_target_seqs 1 -outfmt 6
@@ -141,7 +139,6 @@ After characterizing chromosomes, we renamed the scaffolds and split the file in
 
 ### Haplotype-resolved
 The haplotype-resolved assemblies were generated using [RagTag](https://github.com/malonge/RagTag) with each haplotype contigs as a query and the primary chromosome-level assembly as a reference.
-
 ```
 mkdir haplotype_resolved && cd haplotype_resolved
 ragtag.py scaffold -t 10 Cadam_primary_chromosomes.fasta ../Cadam.hic.hap1.p_ctg.fasta -o ragtag_hifiasm_hap1
@@ -171,7 +168,10 @@ We used [VerityMap](https://github.com/ablab/VerityMap) to detect error-prone re
 python /path/to/VerityMap/veritymap/main.py -t 20 -d hifi-diploid --reads Cadam.hifi.fastq -o Cadam_pri_VM Cadam_primary_chromosomes.fasta
 python /path/to/VerityMap/veritymap/main.py -t 20 -d hifi-diploid --reads Cadam.hifi.fastq -o Cadam_hap1_VM Cadam_hap1_chromosomes.fasta
 python /path/to/VerityMap/veritymap/main.py -t 20 -d hifi-diploid --reads Cadam.hifi.fastq -o Cadam_hap2_VM Cadam_hap2_chromosomes.fasta
-
+```
+#### Minimap2
+We used [minimap2](https://github.com/lh3/minimap2) to check the read coverage in specific regions. Additionally, we filtered multi-mapped and low-quality reads using [samtools](https://github.com/samtools/samtools) to check the coverage of unique and high-quality mapped reads im those specific regions.
+```
 ```
 
 #### NucFreq
@@ -179,3 +179,6 @@ We used [NucFreq](https://github.com/mrvollger/NucFreq) to check for collapsed r
 ```
 NucPlot.py ${chr}${begin}-${end}.bam ${chr}${begin}-${end}.png -t $thread --bed file.bed
 ```
+
+#### Plotting coverage of specific regions
+We used [pyGenomeTracks](https://github.com/deeptools/pyGenomeTracks) to plot coverage of mapped hifi reads using minimap2, Inspector, and VerityMap. We followed the well-detailed documentation of pyGenomeTracks.
