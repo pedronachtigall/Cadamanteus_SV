@@ -82,7 +82,7 @@ liftoff -g Cadam_primary_chromosomes.toxin.gtf Cadam_hap2_chromosomes.fasta Cada
 ```
 
 ## Estimate expression level
-We used Bowtie2 and RSEM to estimate the expression level of venom-gland from several individuals as described in the "[Estimating expression level](https://github.com/pedronachtigall/ToxCodAn-Genome/tree/main/Guide#estimating-expression-level)" section of the ToxCodAn-Genome's guide. We mapped the reads into the CDSs retrieved from annotation files and set the ```mismatch-rate``` parameter to 0.02.
+We used Bowtie2 and RSEM to estimate the expression level of venom-gland from 18 individuals <sup>[Hogan et al., 2024](https://doi.org/10.1073/pnas.2313440121)</sup> as described in the "[Estimating expression level](https://github.com/pedronachtigall/ToxCodAn-Genome/tree/main/Guide#estimating-expression-level)" section of the ToxCodAn-Genome's guide. We mapped the reads into the CDSs retrieved from annotation files and set the ```mismatch-rate``` parameter to 0.02.
 
 We used the merged annotation and the primary assembly to retrieve the toxin and nontoxin set of CDSs. The CDSs were retrieved using [GffRead](https://github.com/gpertea/gffread). The datasets used to estimate the expression level of venom-gland is in the file "vg_rna.list". We also trimmed adapters and removed low-quality reads using trim_galore.
 
@@ -121,6 +121,24 @@ plotsr --sr syri.out --genomes genomes.txt -H 8 -W 5 -o ALL_hap1Xhap2.pdf
 We used [GENESPACE](https://github.com/jtlovell/GENESPACE) and followed its guide to compare haplotypes at gene-level.
 
 ### Microsynteny of toxin genes
+We used BLAST to perform a microsynteny of the toxin gene regions between haplotypes and primary assemblies.
+```
+```
+
+## Exon-capture data analysis
+We used a set of exon-capture data available for 139 individuals of *C. adamanteus* sampled throughout the species distribution <sup>[Margres et al., 2017](https://doi.org/10.1534/genetics.117.202655);[Margres et al., 2019](https://doi.org/10.1093/molbev/msy207)</sup>.
+
+We trimmed adapters and removed low-quality reads.
+```
+```
+
+We mapped reads using the primary genome assembly as reference.
+```
+```
+
+### Genotyping SVMP
+
+### Estimating CNV of MYO
 
 ## Cite
 If you follow the pipelines and/or scripts in this repository, please cite:
