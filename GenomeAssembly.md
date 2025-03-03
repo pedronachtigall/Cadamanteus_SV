@@ -172,13 +172,44 @@ python /path/to/VerityMap/veritymap/main.py -t 20 -d hifi-diploid --reads Cadam.
 #### Minimap2
 We used [minimap2](https://github.com/lh3/minimap2) to check the read coverage in specific regions. Additionally, we filtered multi-mapped and low-quality reads using [samtools](https://github.com/samtools/samtools) to check the coverage of unique and high-quality mapped reads im those specific regions.
 ```
+minimap2 -t 40 -ax map-hifi Cadam_primary_chromosomes.fasta Cadam.hifi.fastq | samtools view -@ 40 -bS -o Cadam_primary_hifi.bam -
+samtools sort -@ 40 Cadam_primary_hifi.bam -o Cadam_primary_hifi.mapped.bam
+samtools index Cadam_primary_hifi.bam
+samtools view -@ 40 -q 30 -b Cadam_primary_hifi.mapped.bam -o Cadam_primary_hifi.mapped.q30.bam
+
+minimap2 -t 40 -ax map-hifi Cadam_hap1_chromosomes.fasta Cadam.hifi.fastq | samtools view -@ 40 -bS -o Cadam_hap1_hifi.bam -
+samtools sort -@ 40 Cadam_hap1_hifi.bam -o Cadam_hap1_hifi.mapped.bam
+samtools index Cadam_hap1_hifi.bam
+samtools view -@ 40 -q 30 -b Cadam_hap1_hifi.mapped.bam -o Cadam_hap1_hifi.mapped.q30.bam
+
+minimap2 -t 40 -ax map-hifi Cadam_hap2_chromosomes.fasta Cadam.hifi.fastq | samtools view -@ 40 -bS -o Cadam_hap2_hifi.bam -
+samtools sort -@ 40 Cadam_hap2_hifi.bam -o Cadam_hap2_hifi.mapped.bam
+samtools index Cadam_hap2_hifi.bam
+samtools view -@ 40 -q 30 -b Cadam_hap2_hifi.mapped.bam -o Cadam_hap2_hifi.mapped.q30.bam
 ```
 
 #### NucFreq
 We used [NucFreq](https://github.com/mrvollger/NucFreq) to check for collapsed regions, which may reflect assembly artifacts occurring in error-prone regions.
 ```
-NucPlot.py ${chr}${begin}-${end}.bam ${chr}${begin}-${end}.png -t $thread --bed file.bed
+#retrieve a bam file for the specific region
+samtools view -h -o ${chr}_${begin}-${end}.bam mapped.bam ${chr}:${begin}-${end}
+samtools index ${chr}_${begin}-${end}.bam
+#run nucplot
+NucPlot.py ${chr}_${begin}-${end}.bam ${chr}_${begin}-${end}.png -t $thread
 ```
 
 #### Plotting coverage of specific regions
 We used [pyGenomeTracks](https://github.com/deeptools/pyGenomeTracks) to plot coverage of mapped hifi reads using minimap2, Inspector, and VerityMap. We followed the well-detailed documentation of pyGenomeTracks.
+
+The bam files were converted into bedGraph to plot charts: ```bedtools genomecov -ibam mapped.bam -bg > mapped.bedGraph```
+
+Regions screened:
+- **SVMP**
+  - Primary - Cadam_mi-1:26000000-26900000
+  - Haplotype_1 - Cadam_hap1_mi-1:20900000-21700000
+  - Haplotype_2 - Cadam_hap2_mi-1:22200000-23100000
+
+- **SVSP**
+  - Primary - Cadam_mi-2:8900000-10200000
+  - Haplotype_1 - Cadam_hap1_mi-2:8800000-9600000
+  - Haplotype_2 - Cadam_hap2_mi-2:8800000-9900000
