@@ -171,15 +171,40 @@ We used a set of exon-capture data available for 139 individuals of *C. adamante
 
 We trimmed adapters and removed low-quality reads.
 ```
+for i in capture_data.list; do
+	trim_galore --paired --phred33 --length 75 -q 25 --stringency 1 -e 0.1 -o ${i}_tg Sample_${i}/${i}*R1*.fastq.gz Sample_${i}/${i}*R2*.fastq.gz
+done
 ```
 
-We mapped reads using the primary genome assembly as reference.
+We mapped reads using [Bowtie2](https://github.com/BenLangmead/bowtie2) with the primary genome assembly as reference.
 ```
+mkdir B2_index
+bowtie2-build Cadam_primary_chromosomes.fasta B2_index/Cadam
+
+for i in capture_data.list; do
+	bowtie2 -p 20 --very-sensitive --no-unal --no-mixed --no-discordant -k 10 -X 700 -x B2_index/Cadam -1 ${i}_tg/${i}*_1.fq.gz -2 ${i}_tg/${i}*_2.fq.gz | samtools view -u - | samtools sort -o ${i}.mapped.bam -
+	samtools view -@ 40 -q 30 -b ${i}.bam -o ${i}.mapped.q30.bam
+	samtools index ${i}.mapped.q30.bam
+done
 ```
 
 ### Genotyping SVMP
+We used the mapped reads (filtered for multi-mapped reads) to retrieve coverage for SVMP genes.
+```
+for i in capture_data.list; do
+	samtools depth -b SVMP_region.bed ${i}.mapped.q30.bam > ${i}.SVMP.depth.txt
+done
+```
+We calculated the average of coverage for all SVMP genes and comapred to each SVMP gene for each individual.
 
 ### Estimating CNV of MYO
+We used the mapped reads (not filtered for multi-mapped reads) to retrieve coverage for MYO and 10 nontoxin genes located at the same chromosome (i.e., ma-2; ATPSynLipid-1, ATPase-lys70, CD63, Calreticulin, DAZ-2, GADD45, Glutaredoxin-1, Leptin-1, PDI, and Nexin-2).
+```
+for i in capture_data.list; do
+	samtools depth -b MYO_region.bed ${i}.bam > ${i}.MYO.depth.txt
+done
+```
+We calculated the average of coverage of MYO to the average of coverage of the nontoxin genes to estimate the CNV for each individual.
 
 ## Cite
 If you follow the pipelines and/or scripts in this repository, please cite:
