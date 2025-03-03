@@ -137,6 +137,29 @@ minimap2 -k19 -w19 -t32 /path/to/Crovir_chr_only.fasta yahs.out_scaffolds_final.
 
 After characterizing chromosomes, we renamed the scaffolds and split the file into chromsomes and unplaced for downstream analysis.
 
+### Confirm sex chromosomes
+To double-check the sex chromosomes, we mapped whole genome seqeuncing data available for a male and female individuals. We used [bwa](https://github.com/lh3/bwa) and checked the read coverage manually using [IGV](https://igv.org/).
+
+The raw data is listed below:
+| Sample ID | Sex | NCBI accession |
+| :-------- | :-------: | :------------: | 
+| KW0944 | Male | SRR12802469 |
+| KW1264 | Female | SRR12802470 |
+
+```
+mkdir wgs
+for i in KW0944 KW1264; do
+	bwa mem -t 40 Cadam_primary_chromosomes.fasta wgs/${i}/${i}_tg/${i}_R1_val_1.fq.gz wgs/${i}/${i}_tg/${i}_R2_val_2.fq.gz > wgs/${i}_align.sam
+	samtools view -@ 40 -b -S -F 4 -o wgs/${i}_mapped.bam wgs/${i}_align.sam
+	rm wgs/${i}_align.sam
+	samtools sort -@ 40 wgs/${i}_mapped.bam -o wgs/${i}_mapped_sorted.bam
+	rm wgs/${i}_mapped.bam
+	samtools view -@ 40 -q 30 -b wgs/${i}_mapped_sorted.bam -o wgs/${i}_mapped_sorted.q30.bam
+	samtools index wgs/${i}_mapped_sorted.q30.bam
+	bedtools genomecov -ibam wgs/${i}_mapped_sorted.q30.bam -bg > wgs/${i}_q30_cov.bedGraph
+done
+```
+
 ### Haplotype-resolved
 The haplotype-resolved assemblies were generated using [RagTag](https://github.com/malonge/RagTag) with each haplotype contigs as a query and the primary chromosome-level assembly as a reference.
 ```
