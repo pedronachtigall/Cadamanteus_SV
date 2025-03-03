@@ -122,8 +122,49 @@ We used [GENESPACE](https://github.com/jtlovell/GENESPACE) and followed its guid
 
 ### Microsynteny of toxin genes
 We used BLAST to perform a microsynteny of the toxin gene regions between haplotypes and primary assemblies.
+
+Regions screened:
+- **SVMP**
+  - Primary - Cadam_mi-1:26000000-26900000
+  - Haplotype_1 - Cadam_hap1_mi-1:20900000-21700000
+  - Haplotype_2 - Cadam_hap2_mi-1:22200000-23100000
+
+- **SVSP**
+  - Primary - Cadam_mi-2:8900000-10200000
+  - Haplotype_1 - Cadam_hap1_mi-2:8800000-9600000
+  - Haplotype_2 - Cadam_hap2_mi-2:8800000-9900000
+
+- **MYO**
+  - Primary - Cadam_ma-2:286300000-288700000
+  - Haplotype_1 - Cadam_hap1_ma-2:282500000-283000000
+  - Haplotype_2 - Cadam_hap2_ma-2:284250000-286100000
+
+- **PLA2**
+  - Primary - Cadam_mi-8:295000-330000
+  - Haplotype_1 - Cadam_hap1_mi-8:300000-335000
+  - Haplotype_2 - Cadam_hap2_mi-8:294000-330000
+
+- **CTL**
+  - Primary - Cadam_mi-2:172000-1490000
+  - Haplotype_1 - Cadam_hap1_mi-2:74000-1561000
+  - Haplotype_2 - Cadam_hap2_mi-2:24000-1530000
+
 ```
+#retrieve regions from assembly
+samtools faidx Cadam_primary_chromosomes.fasta "${chr}:${start}-${end}" | awk '/^>/{print ">pri_${GENE}"; next}{print}' > ${GENE}_pri.fasta
+samtools faidx Cadam_hap1_chromosomes.fasta "${chr}:${start}-${end}" | awk '/^>/{print ">hap1_${GENE}"; next}{print}' > ${GENE}_hap1.fasta
+samtools faidx Cadam_hap2_chromosomes.fasta "${chr}:${start}-${end}" | awk '/^>/{print ">hap2_${GENE}"; next}{print}' > ${GENE}_hap2.fasta
+
+#run BLAST
+makeblastdb -dbtype nucl -in ${GENE}_pri.fasta -out blastDB/PRI
+makeblastdb -dbtype nucl -in ${GENE}_hap1.fasta -out blastDB/HAP1
+makeblastdb -dbtype nucl -in ${GENE}_hap2.fasta -out blastDB/HAP2
+blastn -num_threads 6 -perc_identity 90 -query ${GENE}_hap1.fasta -db blastDB/PRI -out ${GENE}_priXhap1_blast.out -outfmt 6
+blastn -num_threads 6 -perc_identity 90 -query ${GENE}_hap2.fasta -db blastDB/PRI -out ${GENE}_priXhap2_blast.out -outfmt 6
+blastn -num_threads 6 -perc_identity 90 -query ${GENE}_hap1.fasta -db blastDB/HAP2 -out ${GENE}_hap1Xhap2_blast.out -outfmt 6
 ```
+
+We used the BLAST output to pot alignments using [ggplot2](https://ggplot2.tidyverse.org/) in R.
 
 ## Exon-capture data analysis
 We used a set of exon-capture data available for 139 individuals of *C. adamanteus* sampled throughout the species distribution <sup>[Margres et al., 2017](https://doi.org/10.1534/genetics.117.202655);[Margres et al., 2019](https://doi.org/10.1093/molbev/msy207)</sup>.
