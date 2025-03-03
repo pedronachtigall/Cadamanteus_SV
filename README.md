@@ -195,7 +195,7 @@ for i in capture_data.list; do
 	samtools depth -b SVMP_region.bed ${i}.mapped.q30.bam > ${i}.SVMP.depth.txt
 done
 ```
-We calculated the average of coverage for all SVMP genes and comapred to each SVMP gene for each individual.
+We calculated the average of coverage for all SVMP genes and comapred to each SVMP gene for each individual using the [```SVMP_counter.py```](https://raw.githubusercontent.com/pedronachtigall/Cadamanteus_SV/refs/heads/main/scripts/SVMP_counter.py) script. Then, we manually checked the output and the read coverage using IGV to infer the final genotype.
 
 ### Estimating CNV of MYO
 We used the mapped reads (not filtered for multi-mapped reads) to retrieve coverage for MYO and 10 nontoxin genes located at the same chromosome (i.e., ma-2; ATPSynLipid-1, ATPase-lys70, CD63, Calreticulin, DAZ-2, GADD45, Glutaredoxin-1, Leptin-1, PDI, and Nexin-2).
@@ -204,7 +204,7 @@ for i in capture_data.list; do
 	samtools depth -b MYO_region.bed ${i}.bam > ${i}.MYO.depth.txt
 done
 ```
-We calculated the average of coverage of MYO to the average of coverage of the nontoxin genes to estimate the CNV for each individual using the ```MYO_counter.py``` script available [here](https://raw.githubusercontent.com/pedronachtigall/Cadamanteus_SV/refs/heads/main/scripts/MYO_counter.py).
+We calculated the average of coverage of MYO to the average of coverage of the nontoxin genes to estimate the CNV for each individual using the [```MYO_counter.py```](https://raw.githubusercontent.com/pedronachtigall/Cadamanteus_SV/refs/heads/main/scripts/MYO_counter.py) script.
 
 ## Cite
 If you follow the pipelines and/or scripts in this repository, please cite:
