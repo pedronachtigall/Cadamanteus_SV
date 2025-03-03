@@ -204,7 +204,7 @@ for i in capture_data.list; do
 	samtools depth -b MYO_region.bed ${i}.bam > ${i}.MYO.depth.txt
 done
 ```
-We calculated the average of coverage of MYO to the average of coverage of the nontoxin genes to estimate the CNV for each individual.
+We calculated the average of coverage of MYO to the average of coverage of the nontoxin genes to estimate the CNV for each individual using the ```MYO_counter.py``` [script](https://raw.githubusercontent.com/pedronachtigall/Cadamanteus_SV/refs/heads/main/scripts/MYO_counter.py).
 
 ## Cite
 If you follow the pipelines and/or scripts in this repository, please cite:
