@@ -207,7 +207,10 @@ done
 We calculated the average of coverage of MYO to the average of coverage of the nontoxin genes to estimate the CNV for each individual using the [```MYO_counter.py```](https://raw.githubusercontent.com/pedronachtigall/Cadamanteus_SV/refs/heads/main/scripts/MYO_counter.py) script.
 
 ## Cite
-If you follow the pipelines and/or scripts in this repository, please cite:
+If you follow the pipelines and/or use any of the scripts in this repository, please cite:
+
+Nachtigall et al. (2025) A Segregating Structural Variant Defines Novel Venom Phenotypes in the Eastern Diamondback Rattlesnake. Molecular Biology and Evolution.
+
 ```
 ADD bibtext here
 ```
