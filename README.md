@@ -10,7 +10,7 @@ Phenotypes in the Eastern Diamondback Rattlesnake" published in *Molecular Biolo
 All datasets used in the present study are detailed in the Supplementary file of the published manuscript.
 
 ## Genome assembly
-The genome assembly is described in the "[GenomeAssembly.md](https://github.com/pedronachtigall/Cadamanteus_SV/blob/main/GenomeAssembly.md)" file.
+The genome assembly pipeline is described in the "[GenomeAssembly.md](https://github.com/pedronachtigall/Cadamanteus_SV/blob/main/GenomeAssembly.md)" file.
 
 ## Genome annotation
 ### Repeat annotation
@@ -18,7 +18,7 @@ The repeat annotation was performed using [RepeatModeler2](https://github.com/Df
 
 The pipeline with commands and scripts used to perform the repeat annotation is decribed in the following tutorial: https://github.com/pedronachtigall/Repeat-annotation-pipeline
 
-For this step, we used the primary assembly to perform the repeat annotation and the soft-masked primary assembly as the source for gene annotation.
+For this step, we used the primary genome assembly to perform the repeat annotation and the soft-masked primary genome assembly as the source for gene annotation.
 
 ### Gene annotation
 The gene annotation was performed using the [funannotate](https://github.com/nextgenusfs/funannotate) pipeline. We followed the commands decribed in the "[NonToxin annotation](https://github.com/pedronachtigall/ToxCodAn-Genome/tree/main/Guide#nontoxin-annotation)" section of the ToxCodAn-Genome's guide.
@@ -164,7 +164,7 @@ blastn -num_threads 6 -perc_identity 90 -query ${GENE}_hap2.fasta -db blastDB/PR
 blastn -num_threads 6 -perc_identity 90 -query ${GENE}_hap1.fasta -db blastDB/HAP2 -out ${GENE}_hap1Xhap2_blast.out -outfmt 6
 ```
 
-We used the BLAST output to pot alignments using [ggplot2](https://ggplot2.tidyverse.org/) in R.
+We used the BLAST output to plot alignments using [ggplot2](https://ggplot2.tidyverse.org/) in R.
 
 ## Exon-capture data analysis
 We used a set of exon-capture data available for 139 individuals of *C. adamanteus* sampled throughout the species distribution <sup>[Margres et al., 2017](https://doi.org/10.1534/genetics.117.202655);[Margres et al., 2019](https://doi.org/10.1093/molbev/msy207)</sup>.
@@ -198,7 +198,7 @@ done
 We calculated the average of coverage for all SVMP genes and comapred to each SVMP gene for each individual using the [```SVMP_counter.py```](https://raw.githubusercontent.com/pedronachtigall/Cadamanteus_SV/refs/heads/main/scripts/SVMP_counter.py) script. Then, we manually checked the output and the read coverage using IGV to infer the final genotype.
 
 ### Estimating CNV of MYO
-We used the mapped reads (not filtered for multi-mapped reads) to retrieve coverage for MYO and 10 nontoxin genes located at the same chromosome (i.e., ma-2; ATPSynLipid-1, ATPase-lys70, CD63, Calreticulin, DAZ-2, GADD45, Glutaredoxin-1, Leptin-1, PDI, and Nexin-2).
+We used the mapped reads (not filtered for multi-mapped reads) to retrieve coverage for MYO and 10 nontoxin genes (i.e., ATPSynLipid-1, ATPase-lys70, CD63, Calreticulin, DAZ-2, GADD45, Glutaredoxin-1, Leptin-1, PDI, and Nexin-2) located at the same chromosome (i.e., ma-2).
 ```
 for i in capture_data.list; do
 	samtools depth -b MYO_region.bed ${i}.bam > ${i}.MYO.depth.txt
