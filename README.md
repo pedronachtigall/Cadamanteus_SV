@@ -1,7 +1,7 @@
 
 
 # Crotalus adamanteus structural variant
-[![Published in MBE](https://img.shields.io/badge/published%20in-MBE-blue)](https://doi.org/10.1093/gigascience/giad116)
+[![Published in MBE](https://img.shields.io/badge/published%20in-MBE-blue)](https://doi.org/10.1093/molbev/msaf058)
 [![Data available in the Fisghare](https://img.shields.io/badge/data%20available%20in%20the-figshare-red)](https://figshare.com/projects/Eastern_diamondback_rattlesnake_Crotalus_adamanteus_-_haplotype-resolved_genome_assembly/200614)
 
 This repository contains commands and scripts used in the manuscript "A Segregating Structural Variant Defines Novel Venom
@@ -209,8 +209,19 @@ We calculated the average of coverage of MYO to the average of coverage of the n
 ## Cite
 If you follow the pipelines and/or use any of the scripts in this repository, please cite:
 
-Nachtigall et al. (2025) A Segregating Structural Variant Defines Novel Venom Phenotypes in the Eastern Diamondback Rattlesnake. Molecular Biology and Evolution.
+Nachtigall et al. (2025) A Segregating Structural Variant Defines Novel Venom Phenotypes in the Eastern Diamondback Rattlesnake. Molecular Biology and Evolution. [https://doi.org/10.1093/molbev/msaf058](https://doi.org/10.1093/molbev/msaf058)
 
 ```
-ADD bibtext here
+@article{Nachtigall:2025,
+    author = {Nachtigall, Pedro G and Nystrom, Gunnar S and Broussard, Emilie M and Wray, Kenneth P and Junqueira-de-Azevedo, Inácio L M and Parkinson, Christopher L and Margres, Mark J and Rokyta, Darin R},
+    title = {A Segregating Structural Variant Defines Novel Venom Phenotypes in the Eastern Diamondback Rattlesnake},
+    journal = {Molecular Biology and Evolution},
+    pages = {msaf058},
+    year = {2025},
+    month = {03},
+    issn = {1537-1719},
+    doi = {10.1093/molbev/msaf058},
+    url = {https://doi.org/10.1093/molbev/msaf058},
+    eprint = {https://academic.oup.com/mbe/advance-article-pdf/doi/10.1093/molbev/msaf058/62445184/msaf058.pdf},
+}
 ```
