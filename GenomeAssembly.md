@@ -63,7 +63,7 @@ yahs Cadam_DRR0105.hic.p_ctg.fasta aligned.bam
 ```
 
 ### Review of scaffolded genome
-We used [Juicer](https://github.com/aidenlab/juicer) and the [3D-DNA](https://github.com/aidenlab/3d-dna) to manually review the scaffolded genome following the standard [DNA Genome Assembly Cookbook](https://aidenlab.org/assembly/manual 180322.pdf) instructions.
+We used [Juicer](https://github.com/aidenlab/juicer) and the [3D-DNA](https://github.com/aidenlab/3d-dna) to manually review the scaffolded genome following the standard [DNA Genome Assembly Cookbook](https://aidenlab.org/assembly/manual_180322.pdf) instructions.
 ```
 #prepare folder to run juicer
 mkdir Juicer && cd Juicer
