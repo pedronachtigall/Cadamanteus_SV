@@ -1,4 +1,10 @@
+<div align="center">
+<center>
 
+![Cadam_SV](/cover_MBE_Cadam_SV_for_github.png)
+
+</center>
+</div>
 
 # Crotalus adamanteus structural variant
 [![Published in MBE](https://img.shields.io/badge/published%20in-MBE-blue)](https://doi.org/10.1093/molbev/msaf058)
